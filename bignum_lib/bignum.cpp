@@ -132,15 +132,15 @@ bignum bignum_rs1(bignum a) {
 }
 
 bignum bignum_div_u1(bignum a, bignum b) {
-	// a/b µÄ¹¤¾ß £¬ ·µ»Ø 1000....0
+	// a/b çš„å·¥å…· ï¼Œ è¿”å› 1000....0
 	bignum ls;
 	UCHAR flag = 0;
 	if (0 == bignum_cmp(a, b)) {
 		a.clear();
-		return a;//³ö´í
+		return a;//å‡ºé”™
 	}
 
-	//ULONG64 ¶ÔÆë
+	//ULONG64 å¯¹é½
 	int x64a = 0;
 	int xh = 0;
 	for (xh = b.U64_Len; xh < a.U64_Len; xh++) {
@@ -156,7 +156,7 @@ bignum bignum_div_u1(bignum a, bignum b) {
 	int shift = 0, xb = 0, xb1 = 0, xb2 = 0;
 	PUCHAR p = NULL;
 	p = (PUCHAR)&a.U64[a.U64_Len];
-	p--;//Ö¸Ïòa.U64[a.U64_Len-1]µÄ×î¸ß×Ö½Ú
+	p--;//æŒ‡å‘a.U64[a.U64_Len-1]çš„æœ€é«˜å­—èŠ‚
 	while (*p == 0x0) {
 		p--;
 		xb1 = xb1 + 2;
@@ -166,7 +166,7 @@ bignum bignum_div_u1(bignum a, bignum b) {
 	}
 
 	p = (PUCHAR)&b.U64[b.U64_Len];
-	p--;//Ö¸Ïòa.U64[a.U64_Len-1]µÄ×î¸ß×Ö½Ú
+	p--;//æŒ‡å‘a.U64[a.U64_Len-1]çš„æœ€é«˜å­—èŠ‚
 	while (*p == 0x0) {
 		p--;
 		xb2 = xb2 + 2;
@@ -190,11 +190,11 @@ bignum bignum_div_u1(bignum a, bignum b) {
 			b = bignum_ls(b, (ULONG64)xb * 4);
 			flag = bignum_cmp(a, b);
 			if (flag == 0) {
-				//ÍêÈ«¶ÔÆëºó£¬a<b
+				//å®Œå…¨å¯¹é½åï¼Œa<b
 				ls = bignum_ls(ls, ((ULONG64)xb - 1) * 4);
 			}
 			else {
-				//ÍêÈ«¶ÔÆëºó a>b or a=b
+				//å®Œå…¨å¯¹é½å a>b or a=b
 				ls = bignum_ls(ls, (ULONG64)xb * 4);
 			}
 		}
@@ -203,11 +203,11 @@ bignum bignum_div_u1(bignum a, bignum b) {
 			b = bignum_rs(b, (ULONG64)xb * 4);
 			flag = bignum_cmp(a, b);
 			if (flag == 0) {
-				//ÍêÈ«¶ÔÆëºó£¬a<b
+				//å®Œå…¨å¯¹é½åï¼Œa<b
 				ls = bignum_rs(ls, ((ULONG64)xb + 1) * 4);
 			}
 			else {
-				//ÍêÈ«¶ÔÆëºó a>b or a=b
+				//å®Œå…¨å¯¹é½å a>b or a=b
 				ls = bignum_rs(ls, (ULONG64)xb * 4);
 			}
 		}
@@ -247,11 +247,11 @@ bignum bignum_add(bignum a, bignum b) {
 
 	for (ULONG32 i = 0; i < Number_of_cycles; i++) {
 		add = a.U64[i] + b.U64[i];
-		if (add < a.U64[i]) {//Òç³ö
+		if (add < a.U64[i]) {//æº¢å‡º
 			ls.U64[i + 1] += 1;
 		}
 		ls.U64[i] += add;
-		if (ls.U64[i] < add) {//Òç³ö
+		if (ls.U64[i] < add) {//æº¢å‡º
 			ls.U64[i + 1] += 1;
 		}
 	}
@@ -268,7 +268,7 @@ bignum bignum_sub(bignum a, bignum b) {
 	ULONG64 sub = 0;
 	ULONG32 Number_of_cycles = 0;
 	if (0 == bignum_cmp(a, b))
-		return ls;//a<bÎŞ·¨¼õ
+		return ls;//a<bæ— æ³•å‡
 
 	if (a.U64_Len > b.U64_Len)
 		Number_of_cycles = a.U64_Len;
@@ -276,7 +276,7 @@ bignum bignum_sub(bignum a, bignum b) {
 		Number_of_cycles = b.U64_Len;
 	for (ULONG32 i = 0; i < Number_of_cycles; i++) {
 		sub = a.U64[i] - b.U64[i];
-		if (sub > a.U64[i]) {//Òç³ö
+		if (sub >= a.U64[i] && i< Number_of_cycles-1) {//æº¢å‡º
 			ls.U64[i + 1] -= 1;
 		}
 		ls.U64[i] += sub;
@@ -286,7 +286,7 @@ bignum bignum_sub(bignum a, bignum b) {
 }
 
 bignum bignum_imul(bignum a, bignum b) {
-	// a * b , aÔÚÉÏ£¬bÔÚÏÂ
+	// a * b , aåœ¨ä¸Šï¼Œbåœ¨ä¸‹
 	ULONG32  Number_of_cycles = 0;
 	if (a.U64_Len > b.U64_Len)
 		Number_of_cycles = a.U64_Len;
@@ -305,7 +305,7 @@ bignum bignum_imul(bignum a, bignum b) {
 	}
 	bignum out;
 	ULONG64 mul = 0, a1 = 0, b1 = 0;
-	ULONG32 c = 0, o = 0;//½øÎ»Êı Ô­Î»Êı
+	ULONG32 c = 0, o = 0;//è¿›ä½æ•° åŸä½æ•°
 	for (int i = 0; i < Number_of_cycles * 2; i++) {
 		//printf("a");
 		for (int j = 0; j < Number_of_cycles * 2; j++) {
@@ -365,7 +365,7 @@ bignum bignum_mod(bignum dividend, bignum divisor) {
 	bignum ls, quotient, remainder = dividend;
 	bignum quotient_ls, quotient_num;
 	ULONG32 j = 0;
-	if (bignum_cmp(divisor, ls) == 2 || bignum_cmp(dividend, ls) == 2)//³ıÊı£¬±»³ıÊıµÈÓÚÁã£¬·µ»Ø0
+	if (bignum_cmp(divisor, ls) == 2 || bignum_cmp(dividend, ls) == 2)//é™¤æ•°ï¼Œè¢«é™¤æ•°ç­‰äºé›¶ï¼Œè¿”å›0
 		return ls;
 	if (bignum_cmp(dividend, divisor) == 2)
 		return ls;
@@ -439,7 +439,7 @@ bignum bignum_not(bignum a) {
 }
 
 bignum bignum_pow(bignum a, bignum b) {
-	// pow(a,b) aµÄb´Î·½
+	// pow(a,b) açš„bæ¬¡æ–¹
 	bignum ls,zero,one;
 	ls.U64[0] = 1;
 	one.U64[0] = 1;
@@ -452,7 +452,7 @@ bignum bignum_pow(bignum a, bignum b) {
 		num = bignum_rs(num, 1);
 		t = bignum_imul(t, t);
 		if (bignum_cmp(t, zero) == 2)
-			return zero;//Òç³ö
+			return zero;//æº¢å‡º
 	}
 	return ls;
 } 
